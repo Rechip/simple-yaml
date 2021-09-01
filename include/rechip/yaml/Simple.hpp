@@ -161,11 +161,15 @@ struct Deserializer<std::vector<T>> {
 	}
 };
 
+template<typename T>
+concept deserializable_v = !std::is_same_v<void, decltype(Deserializer<T>::deserialize)>;
+
 struct Field {
 	Field(const ::YAML::Node& n, const std::string& path) : _data(n), _path(path) {
 	}
 
 	template<typename T>
+	requires deserializable_v<T>
 	operator T() {
 		if (!_data.IsDefined()) {
 			if (_defaultValue.has_value()) {
