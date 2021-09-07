@@ -41,7 +41,7 @@ private:
 	std::source_location _loc;
 };
 
-std::ostream& operator<<(std::ostream& os, const Exception& e) {
+inline std::ostream& operator<<(std::ostream& os, const Exception& e) {
 	return os << e.what() << " " << e.yamlLocation();
 }
 
