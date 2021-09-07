@@ -32,7 +32,7 @@ struct Configuration : rechip::yaml::Simple {
 	using Simple::Simple;
 
 	std::string user = bound("username");
-	std::string pass = bounf("password");
+	std::string pass = bound("password");
 };
 ```
 and parsing looks like
