@@ -162,7 +162,7 @@ struct Deserializer<std::vector<T>> {
 };
 
 template<typename T>
-concept deserializable_v = !std::is_same_v<void, decltype(Deserializer<T>::deserialize)>;
+concept deserializable_v = !std::is_same_v<void, decltype(Deserializer<T>::deserialize(YAML::Node{}, std::string{}))>;
 
 struct Field {
 	Field(const ::YAML::Node& n, const std::string& path) : _data(n), _path(path) {
@@ -204,6 +204,8 @@ private:
 struct Simple {
 	Simple(const YAML::Node& n, const std::string& path = "") : _data(n), _path(path) {
 	}
+	Simple(const Simple& other) = default;
+	Simple(Simple&& other)      = default;
 
 	Field bound(const std::string& key) {
 		return Field{_data[key], _path + "/" + key};
