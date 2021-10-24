@@ -3,7 +3,7 @@ from conans import ConanFile, CMake, tools
 
 class SimpleYamlConan(ConanFile):
     name = "simple-yaml"
-    version = "0.1.1"
+    version = "0.1.2"
     license = "MIT"
     url = "https://github.com/Rechip/simple-yaml"
     description = "Read YAML configuration files by code structure"

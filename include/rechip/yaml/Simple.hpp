@@ -12,6 +12,10 @@
 #	include "../pretty_name.hpp"
 #	include "Exception.hpp"
 
+#	if defined(__has_include) && __has_include(<magic_enum.hpp>)
+#		include <magic_enum.hpp>
+#	endif
+
 namespace rechip::yaml {
 
 constexpr auto fromFile   = YAML::LoadFile;
@@ -57,7 +61,6 @@ struct Deserializer<T> {
 };
 
 #	if defined(__has_include) && __has_include(<magic_enum.hpp>)
-#		include <magic_enum.hpp>
 
 template<typename T>
 requires std::is_enum_v<T>
