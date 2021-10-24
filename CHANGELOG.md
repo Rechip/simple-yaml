@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/Rechip/simple-yaml/compare/v0.1.2...v0.1.3) (2021-10-24)
+
+
+### Bug Fixes
+
+* include magic_enum was in the namespace ([06214d3](https://github.com/Rechip/simple-yaml/commit/06214d392d6a2193780b65747ad907dba5b4a48b))
+
 ### [0.1.2](https://github.com/Rechip/simple-yaml/compare/v0.1.1...v0.1.2) (2021-09-07)
 
 
