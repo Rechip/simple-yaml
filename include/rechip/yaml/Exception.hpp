@@ -47,6 +47,22 @@ inline std::ostream& operator<<(std::ostream& os, const Exception& e) {
 
 using RuntimeError = BaseException<std::runtime_error>;
 
+struct MissingNode : RuntimeError {
+	using RuntimeError::RuntimeError;
+};
+
+struct InvalidNodeType : RuntimeError {
+	using RuntimeError::RuntimeError;
+};
+
+struct InvalidNode : RuntimeError {
+	using RuntimeError::RuntimeError;
+};
+
+struct InvalidDefaultValue : RuntimeError {
+	using RuntimeError::RuntimeError;
+};
+
 } // namespace rechip::yaml
 
 #endif // __RECHIP_YAML_EXCEPTION_HPP__
