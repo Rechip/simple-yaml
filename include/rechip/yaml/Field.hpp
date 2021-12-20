@@ -75,7 +75,7 @@ struct Field {
 
 	template<typename T>
 	Field& addRuleRange(T min, T max, const std::string& errMsg = "") {
-		return addRule<T>([min, max](const T& value) { return min <= value && value <= max; })
+		return addRule<T>([min, max](const T& value) { return min <= value && value <= max; });
 	}
 
 	template<typename T>
