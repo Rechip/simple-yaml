@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/Rechip/simple-yaml/compare/v0.1.5...v0.2.0) (2022-01-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* reworked as a library, compile-time type check of Default value
+
+### Features
+
+* reworked as a library, compile-time type check of Default value ([3ccf90c](https://github.com/Rechip/simple-yaml/commit/3ccf90ce4ae6bbcec21bfb6fc0fa23351de5fcb4))
+
 ### [0.1.5](https://github.com/Rechip/simple-yaml/compare/v0.1.3...v0.1.5) (2021-12-26)
 
 
