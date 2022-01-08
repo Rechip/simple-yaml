@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __RECHIP_YAML_DESERIALIZER_HPP__
-#	define __RECHIP_YAML_DESERIALIZER_HPP__
+#ifndef __SIMPLE_YAML_DESERIALIZER_HPP__
+#	define __SIMPLE_YAML_DESERIALIZER_HPP__
 
 #	include <type_traits>
 #	include <chrono>
@@ -14,7 +14,7 @@
 
 #	include "Exception.hpp"
 
-namespace rechip::yaml {
+namespace simple_yaml {
 
 template<typename T>
 struct Deserializer {
@@ -53,7 +53,7 @@ struct Deserializer<T> {
 			for (auto a : magic_enum::enum_names<T>()) {
 				values += " " + std::string{a};
 			}
-			throw InvalidNode("Invalid enum value (possible:" + values + ") at " + path, n.Mark());
+			throw InvalidNodeType("Invalid enum value \"" + n.as<std::string>() + "\" (possible:" + values + ") at " + path, n.Mark());
 		}
 		return en.value();
 	}
@@ -125,6 +125,6 @@ struct Deserializer<std::vector<T>> {
 	}
 };
 
-} // namespace rechip::yaml
+} // namespace simple_yaml
 
 #endif

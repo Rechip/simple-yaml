@@ -1,13 +1,13 @@
 #pragma once
-#ifndef __RECHIP_YAML_FIELD_HPP__
-#	define __RECHIP_YAML_FIELD_HPP__
+#ifndef __SIMPLE_YAML_FIELD_HPP__
+#	define __SIMPLE_YAML_FIELD_HPP__
 
 #	include <type_traits>
 #	include <yaml-cpp/yaml.h>
 #	include <regex>
 #	include "Deserializer.hpp"
 
-namespace rechip::yaml {
+namespace simple_yaml {
 
 struct ValidatorFailed : RuntimeError {
 	using RuntimeError::RuntimeError;
@@ -16,6 +16,7 @@ struct ValidatorFailed : RuntimeError {
 template<typename T>
 concept deserializable_v = !std::is_same_v<void, decltype(Deserializer<T>::deserialize(YAML::Node{}, std::string{}))>;
 
+template<typename Default>
 struct Field {
 	Field(const ::YAML::Node& n, const std::string& path) : _data(n), _path(path) {
 	}
@@ -24,18 +25,8 @@ struct Field {
 	requires deserializable_v<T> T convertTo()
 	const {
 		if (!_data.IsDefined()) {
-			if (_defaultValue.has_value()) {
-				try {
-					if constexpr (std::is_same_v<T, std::string>) {
-						if (_defaultValue.type() == typeid(const char*)) {
-							return T{std::any_cast<const char*>(_defaultValue)};
-						}
-					}
-
-					return std::any_cast<T>(_defaultValue);
-				} catch (const std::bad_any_cast& e) {
-					throw InvalidDefaultValue("Invalid default value type for " + _path + ". It has to be '" + pretty_name<T>() + "'", _data.Mark());
-				}
+			if constexpr (!std::is_same_v<Default, void*>) {
+				return _defaultValue;
 			}
 			throw MissingNode("Missing node " + _path, _data.Mark());
 		}
@@ -49,8 +40,13 @@ struct Field {
 		return convertTo<T>();
 	}
 
-	Field& init(std::any defVal) {
-		_defaultValue = defVal;
+	template<typename... Args>
+	Field& init(Args...) {
+		return *this;
+	}
+
+	Field& init(Default defVal) {
+		_defaultValue = std::move(defVal);
 		return *this;
 	}
 
@@ -108,10 +104,11 @@ struct Field {
 
 private:
 	YAML::Node                         _data;
-	std::any                           _defaultValue;
 	std::string                        _path;
 	std::vector<std::function<void()>> _rules;
+	Default                            _defaultValue;
 };
-} // namespace rechip::yaml
+
+} // namespace simple_yaml
 
 #endif

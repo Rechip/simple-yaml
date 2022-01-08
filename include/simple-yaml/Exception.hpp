@@ -1,21 +1,23 @@
 #pragma once
-#ifndef __RECHIP_YAML_EXCEPTION_HPP__
-#	define __RECHIP_YAML_EXCEPTION_HPP__
+#ifndef __SIMPLE_YAML_EXCEPTION_HPP__
+#	define __SIMPLE_YAML_EXCEPTION_HPP__
 
 #	include <source_location>
 #	include <stdexcept>
 #	include <yaml-cpp/yaml.h>
 
-namespace rechip::yaml {
+namespace simple_yaml {
 
-class Exception : public std::exception {
+class Exception {
 public:
 	virtual std::string location() const     = 0;
 	virtual std::string yamlLocation() const = 0;
+
+	virtual ~Exception() = default;
 };
 
 template<typename Parent>
-class BaseException : public Exception, public Parent {
+class BaseException : public Parent, public Exception {
 public:
 	BaseException(const std::string& what, ::YAML::Mark mark, std::source_location loc = std::source_location::current())
 	    : Parent(what), _what(what), _mark(mark), _loc(loc) {
@@ -33,7 +35,7 @@ public:
 		return std::string{"@"} + std::to_string(_mark.line) + ":" + std::to_string(_mark.column);
 	}
 
-	virtual ~BaseException() = default;
+	~BaseException() override = default;
 
 private:
 	std::string          _what;
@@ -41,7 +43,8 @@ private:
 	std::source_location _loc;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Exception& e) {
+template<typename Parent>
+inline std::ostream& operator<<(std::ostream& os, const BaseException<Parent>& e) {
 	return os << e.what() << " " << e.yamlLocation();
 }
 
@@ -59,10 +62,6 @@ struct InvalidNode : RuntimeError {
 	using RuntimeError::RuntimeError;
 };
 
-struct InvalidDefaultValue : RuntimeError {
-	using RuntimeError::RuntimeError;
-};
+} // namespace simple_yaml
 
-} // namespace rechip::yaml
-
-#endif // __RECHIP_YAML_EXCEPTION_HPP__
+#endif // __SIMPLE_YAML_EXCEPTION_HPP__

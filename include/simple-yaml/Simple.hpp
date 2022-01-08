@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __RECHIP_YAML_SIMPLE_HPP__
-#	define __RECHIP_YAML_SIMPLE_HPP__
+#ifndef __SIMPLE_YAML_SIMPLE_HPP__
+#	define __SIMPLE_YAML_SIMPLE_HPP__
 
 #	include <any>
 #	include <filesystem>
@@ -8,13 +8,13 @@
 #	include <string>
 #	include <type_traits>
 #	include <yaml-cpp/yaml.h>
+#	include <pretty-name/pretty_name.hpp>
 
-#	include <rechip/pretty_name.hpp>
 #	include "Exception.hpp"
 #	include "Deserializer.hpp"
 #	include "Field.hpp"
 
-namespace rechip::yaml {
+namespace simple_yaml {
 
 constexpr auto fromFile   = YAML::LoadFile;
 constexpr auto fromString = static_cast<YAML::Node (*)(const std::string&)>(YAML::Load);
@@ -26,8 +26,17 @@ struct Simple {
 	Simple(const Simple& other) = default;
 	Simple(Simple&& other)      = default;
 
-	Field bound(const std::string& key) {
-		return Field{_data[key], _path + "/" + key};
+	inline Field<void*> bound(const std::string& key) {
+		return Field<void*>{_data[key], _path + "/" + key};
+	}
+
+	template<typename T>
+	inline Field<T> bound(const std::string& key, const T& defVal) {
+		return Field<T>{_data[key], _path + "/" + key}.init(defVal);
+	}
+
+	inline Field<std::string> bound(const std::string& key, const char* defVal) {
+		return Field<std::string>{_data[key], _path + "/" + key}.init(std::string{defVal});
 	}
 
 private:
@@ -49,6 +58,6 @@ struct Deserializer<T> {
 	}
 };
 
-} // namespace rechip::yaml
+} // namespace simple_yaml
 
-#endif // __RECHIP_YAML_SIMPLE_HPP__
+#endif // __SIMPLE_YAML_SIMPLE_HPP__
