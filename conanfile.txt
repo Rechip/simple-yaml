@@ -1,0 +1,8 @@
+[requires]
+gtest/cci.20210126
+pretty-name/1.0.0
+yaml-cpp/0.7.0
+magic_enum/0.7.3
+
+[generators]
+cmake

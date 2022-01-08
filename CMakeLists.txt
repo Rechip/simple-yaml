@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.4)
 project(simple_yaml LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -8,11 +8,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-include_directories("include")
-add_executable(simple_yaml test.cpp)
-target_link_libraries(simple_yaml ${CONAN_LIBS})
+file(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/tests/*.cpp)
 
-enable_testing()
-add_test(NAME simple_yaml
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-        COMMAND simple_yaml)
+include(GoogleTest)
+add_executable(simple_yaml_test ${SRC_FILES})
+conan_target_link_libraries(simple_yaml_test)
+gtest_discover_tests(simple_yaml_test)
+
+target_include_directories(simple_yaml_test PUBLIC include)
+

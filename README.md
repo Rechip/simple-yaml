@@ -21,14 +21,14 @@ simple-yaml/0.1
 ```
 
 ## Example simple
-Create a configuration structure, inherit from `rechip::yaml::Simple` and expose original constructor. Then you can `bound` any parameters. If your YAML configuration file looks like 
+Create a configuration structure, inherit from `simple_yaml::Simple` and expose original constructor. Then you can `bound` any parameters. If your YAML configuration file looks like 
 ```yaml
 username: Foo
 password: Bar
 ```
 then your C++ structure would look like
 ```cpp
-struct Configuration : rechip::yaml::Simple {
+struct Configuration : simple_yaml::Simple {
 	using Simple::Simple;
 
 	std::string user = bound("username");
@@ -37,7 +37,7 @@ struct Configuration : rechip::yaml::Simple {
 ```
 and parsing looks like
 ```cpp
-Configuration config{ rechip::yaml::fromFile("config.yaml") };
+Configuration config{ simple_yaml::fromFile("config.yaml") };
 ```
 
 ## Data types
@@ -52,17 +52,17 @@ Many types can be parsed from the configuration file.
 - std::chrono::seconds and std::chrono::milliseconds (as simple numeric types)
 - std::array&lt;T&gt;
 - std::vector&lt;T&gt;
-- any type inheriting from `rechip::yaml::simple`
+- any type inheriting from `simple_yaml::simple`
 
 ## Default values
 
 It is oftenusefull to have some predefined values. Just `init` them.
 ```cpp
-int age = bound("age").init(0);
+int age = bound("age", 0);
 ```
 I have used `std::any` to store the default value until you make conversion to the desired data type. This has one drawback and it is that your default value will have to exactly match the type you will cast to. This is not allowed:
 ```cpp
-int age = bound("age").init(0.0);  // ERROR you init `double`, but cast to `int`
+int age = bound("age", 0.0);  // ERROR you init `double`, but cast to `int`
 ```
 
 ## More complex example
@@ -78,14 +78,14 @@ server:
 main.cpp
 ```cpp
 #include <iostream>
-#include <rechip/yaml.hpp>
-using namespace rechip::yaml;
+#include <simple-yaml/simple_yaml.hpp>
+using namespace simple_yaml;
 
 struct Output : Simple {
 	using Simple::Simple;
 
 	std::filesystem::path file   = bound("file");
-	bool                  pretty = bound("pretty").init(false);
+	bool                  pretty = bound("pretty", false);
 };
 
 struct Server : Simple {
@@ -93,7 +93,7 @@ struct Server : Simple {
 
     std::string           url   = bound("url");
 	std::vector<uint16_t> ports = bound("ports");
-	bool                  https = bound("isSecure").init(true);
+	bool                  https = bound("isSecure", true);
 };
 
 struct Configuration : Simple {
