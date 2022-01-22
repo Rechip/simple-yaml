@@ -1,9 +1,18 @@
 # simple-yaml
 
-Parsing configuration files is not fun. You usually want the config file to represent your inner structure. Thats where `simple-yaml` header-only library comes in. 
+Parsing configuration files is not fun. You usually want the config file to represent your inner structure. Thats where `simple-yaml` header-only library comes in.
+
+## Features
+
+- Parsing from string or a file.
+- Many types of data are supported, see [data types](#data-types).
+- Custom data types
+- Embedded duration parser (eg. `1d 2h 3m 4s` to std::chrono::duration<>)
+- Validation rules (minimum and maximum values, regex, length, ...)
 
 ## Requirements
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp)
+- [source_location](https://github.com/Rechip/source_location) - you can use the standard implementation, this projects just extends compiler support
 - [magic_enum](https://github.com/Neargye/magic_enum) [optional]
 - C++20 - I am too lazy to deal with SFINAE, so I use concepts
 
@@ -49,7 +58,7 @@ Many types can be parsed from the configuration file.
 - numeric types
 - std::string
 - std::filesystem::path
-- std::chrono::seconds and std::chrono::milliseconds (as simple numeric types)
+- std::chrono::duration
 - std::array&lt;T&gt;
 - std::vector&lt;T&gt;
 - any type inheriting from `simple_yaml::simple`
@@ -109,6 +118,33 @@ void main() {
 };
 ```
 
+## Duration - std::chrono::duration<>
+Since I often write network applications, I often want to parse timeouts.
+
+```yaml
+timeout: 1d 2h 30m 10s
+```
+
+```cpp
+struct Configuration : Simple {
+	using Simple::Simple;
+
+	std::chrono::seconds timeout = bound("timeout");
+};
+```
+
+Supported units are:
+- `ns` - nanoseconds
+- `us` - microseconds
+- `ms` - miliseconds
+- `s` - seconds
+- `m` - minutes
+- `h` - hours
+- `d` - days
+- `w` - weeks
+- `mo` or `M` - months
+- `y` - years
+
 ## Custom deserializators
 You can write your own parser for your custom types. Here is a example for the numeric types:
 ```cpp
@@ -128,10 +164,27 @@ struct Deserializer<T> {
 ```
 As simple as that.
 
+# Rules
+
+On many ocasions you want to parse and validate your configuration before you start using it. Eg. in a network application the port number must be of maximum value 65535.
+
+```cpp
+struct Configuration : Simple {
+	using Simple::Simple;
+
+	uint16_t port           = bound("port").addRuleMaximum(65535);
+	uint16_t age            = bound("age").addRuleMinimum(18, "You must be at least 18 years old to drink a beer in Europe");
+	double angle            = bound("angle").addRuleRange(0.0, 360.0);
+	std::string phoneNumber = bound("phoneNumber").addRuleLength(5, 30).addRuleRegex("^\\d+$");
+
+	std::string fruit 		= bound("fruit").addRule([](std::string s){ return s == "apple" || s == "orange"; });
+};
+```
+
 # Kudos
 This is a mere wrapper around [yaml-cpp](https://github.com/jbeder/yaml-cpp) library. All the heavy lifting is done there. Real kudos.
 
 # TODO
 - [ ] Optimize (storing copies of the YAML::Node)
-- [ ] Add more std:: types
+- [x] Add more std:: types
 - [ ] Add more tests

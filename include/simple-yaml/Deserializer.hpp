@@ -1,18 +1,21 @@
-#pragma once
+
 #ifndef __SIMPLE_YAML_DESERIALIZER_HPP__
-#	define __SIMPLE_YAML_DESERIALIZER_HPP__
+#define __SIMPLE_YAML_DESERIALIZER_HPP__
+#pragma once
 
-#	include <type_traits>
-#	include <chrono>
-#	include <filesystem>
-#	include <string>
-#	include <vector>
+#include <charconv>
+#include <chrono>
+#include <filesystem>
+#include <string>
+#include <type_traits>
+#include <vector>
 
-#	if defined(__has_include) && __has_include(<magic_enum.hpp>)
-#		include <magic_enum.hpp>
-#	endif
+#if defined(__has_include) && __has_include(<magic_enum.hpp>)
+#	include <magic_enum.hpp>
+#endif
 
-#	include "Exception.hpp"
+#include "Exception.hpp"
+#include "Parser.hpp"
 
 namespace simple_yaml {
 
@@ -35,7 +38,7 @@ struct Deserializer<T> {
 	}
 };
 
-#	if defined(__has_include) && __has_include(<magic_enum.hpp>)
+#if defined(__has_include) && __has_include(<magic_enum.hpp>)
 
 template<typename T>
 requires std::is_enum_v<T>
@@ -59,20 +62,24 @@ struct Deserializer<T> {
 	}
 };
 
-#	endif
+#endif
 
 // chrono durations as int64_t
-template<typename T>
-requires std::is_same_v<T, std::chrono::seconds> || std::is_same_v<T, std::chrono::milliseconds>
-struct Deserializer<T> {
-	static T deserialize(const YAML::Node& n, const std::string& path) {
+template<typename Rep, typename Period>
+struct Deserializer<std::chrono::duration<Rep, Period>> {
+	static std::chrono::duration<Rep, Period> deserialize(const YAML::Node& n, const std::string& path) {
 		if (!n.IsDefined()) {
 			throw MissingNode("Missing basic type node " + path, n.Mark());
 		}
 		if (!n.IsScalar()) {
 			throw InvalidNodeType("Invalid node type " + path, n.Mark());
 		}
-		return T(n.as<std::int64_t>());
+		const auto string = n.as<std::string>();
+		Rep        result;
+		if (auto [ptr, ec] = std::from_chars(string.data(), string.data() + string.size(), result); ec == std::errc() && ptr == string.data() + string.size()) {
+			return std::chrono::duration<Rep, Period>{result};
+		}
+		return DurationParser<std::chrono::duration<Rep, Period>>::parse(string);
 	}
 };
 

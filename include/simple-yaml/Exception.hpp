@@ -1,10 +1,10 @@
-#pragma once
 #ifndef __SIMPLE_YAML_EXCEPTION_HPP__
-#	define __SIMPLE_YAML_EXCEPTION_HPP__
+#define __SIMPLE_YAML_EXCEPTION_HPP__
+#pragma once
 
-#	include <source_location>
-#	include <stdexcept>
-#	include <yaml-cpp/yaml.h>
+#include <source_location>
+#include <stdexcept>
+#include <yaml-cpp/yaml.h>
 
 namespace simple_yaml {
 

@@ -1,11 +1,12 @@
-#pragma once
 #ifndef __SIMPLE_YAML_FIELD_HPP__
-#	define __SIMPLE_YAML_FIELD_HPP__
+#define __SIMPLE_YAML_FIELD_HPP__
+#pragma once
 
-#	include <type_traits>
-#	include <yaml-cpp/yaml.h>
-#	include <regex>
-#	include "Deserializer.hpp"
+#include <regex>
+#include <type_traits>
+#include <yaml-cpp/yaml.h>
+
+#include "Deserializer.hpp"
 
 namespace simple_yaml {
 
