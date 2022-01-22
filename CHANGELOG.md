@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/Rechip/simple-yaml/compare/v0.2.0...v0.2.1) (2022-01-22)
+
+
+### Features
+
+* associative containers ([41860d8](https://github.com/Rechip/simple-yaml/commit/41860d8817fd0b9cac3beceff957cadacff3fbe8))
+* parse duration strings ([5a8d199](https://github.com/Rechip/simple-yaml/commit/5a8d199d82cf4a8d94806e4a0b6d76f126b30b80))
+
 ## [0.2.0](https://github.com/Rechip/simple-yaml/compare/v0.1.5...v0.2.0) (2022-01-08)
 
 
