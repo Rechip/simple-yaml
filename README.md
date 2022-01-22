@@ -38,10 +38,10 @@ password: Bar
 then your C++ structure would look like
 ```cpp
 struct Configuration : simple_yaml::Simple {
-	using Simple::Simple;
+    using Simple::Simple;
 
-	std::string user = bound("username");
-	std::string pass = bound("password");
+    std::string user = bound("username");
+    std::string pass = bound("password");
 };
 ```
 and parsing looks like
@@ -62,6 +62,7 @@ Many types can be parsed from the configuration file.
 - std::array&lt;T&gt;
 - std::vector&lt;T&gt;
 - any type inheriting from `simple_yaml::simple`
+- associative containers (std::map, std::unordered_map, std::set, std::unordered_set, ...)
 
 ## Default values
 
@@ -91,30 +92,30 @@ main.cpp
 using namespace simple_yaml;
 
 struct Output : Simple {
-	using Simple::Simple;
+    using Simple::Simple;
 
-	std::filesystem::path file   = bound("file");
-	bool                  pretty = bound("pretty", false);
+    std::filesystem::path file   = bound("file");
+    bool                  pretty = bound("pretty", false);
 };
 
 struct Server : Simple {
-	using Simple::Simple;
+    using Simple::Simple;
 
     std::string           url   = bound("url");
-	std::vector<uint16_t> ports = bound("ports");
-	bool                  https = bound("isSecure", true);
+    std::vector<uint16_t> ports = bound("ports");
+    bool                  https = bound("isSecure", true);
 };
 
 struct Configuration : Simple {
-	using Simple::Simple;
+    using Simple::Simple;
 
     Output out    = bound("output");
-	Server server = bound("server");
+    Server server = bound("server");
 };
 
 void main() {
-	Configuration config {fromFile("conf.yaml")};
-	std::cout << "Connecting to: " << config.server.url << std::endl;
+    Configuration config {fromFile("conf.yaml")};
+    std::cout << "Connecting to: " << config.server.url << std::endl;
 };
 ```
 
@@ -127,9 +128,9 @@ timeout: 1d 2h 30m 10s
 
 ```cpp
 struct Configuration : Simple {
-	using Simple::Simple;
+    using Simple::Simple;
 
-	std::chrono::seconds timeout = bound("timeout");
+    std::chrono::seconds timeout = bound("timeout");
 };
 ```
 
@@ -151,15 +152,15 @@ You can write your own parser for your custom types. Here is a example for the n
 template<typename T>
 requires std::is_integral_v<T> || std::is_floating_point_v<T>
 struct Deserializer<T> {
-	static T deserialize(const YAML::Node& n, const std::string& path) {
-		if (!n.IsDefined()) {
-			throw MissingNode("Missing basic type node " + path, n.Mark());
-		}
-		if (!n.IsScalar()) {
-			throw InvalidNodeType("Invalid node type " + path, n.Mark());
-		}
-		return n.as<T>();
-	}
+    static T deserialize(const YAML::Node& n, const std::string& path) {
+        if (!n.IsDefined()) {
+            throw MissingNode("Missing basic type node " + path, n.Mark());
+        }
+        if (!n.IsScalar()) {
+            throw InvalidNodeType("Invalid node type " + path, n.Mark());
+        }
+        return n.as<T>();
+    }
 };
 ```
 As simple as that.
@@ -170,21 +171,59 @@ On many ocasions you want to parse and validate your configuration before you st
 
 ```cpp
 struct Configuration : Simple {
-	using Simple::Simple;
+    using Simple::Simple;
 
-	uint16_t port           = bound("port").addRuleMaximum(65535);
-	uint16_t age            = bound("age").addRuleMinimum(18, "You must be at least 18 years old to drink a beer in Europe");
-	double angle            = bound("angle").addRuleRange(0.0, 360.0);
-	std::string phoneNumber = bound("phoneNumber").addRuleLength(5, 30).addRuleRegex("^\\d+$");
+    uint16_t port           = bound("port").addRuleMaximum(65535);
+    uint16_t age            = bound("age").addRuleMinimum(18, "You must be at least 18 years old to drink a beer in Europe");
+    double angle            = bound("angle").addRuleRange(0.0, 360.0);
+    std::string phoneNumber = bound("phoneNumber").addRuleLength(5, 30).addRuleRegex("^\\d+$");
 
-	std::string fruit 		= bound("fruit").addRule([](std::string s){ return s == "apple" || s == "orange"; });
+    std::string fruit 		= bound("fruit").addRule([](std::string s){ return s == "apple" || s == "orange"; });
 };
 ```
 
+# Associative containers
+If you want to for example parse a conandata.yml file, you can use the following code:
+
+```yaml
+sources:
+  "0.2.0":
+    url: "https://github.com/Rechip/source_location/archive/refs/tags/v0.2.0.zip"
+    sha256: "60ea8261389e4d835eabb1d247a999a59a47733657d20654bac560cef8a63b9c"
+  "0.1.1":
+    url: "https://github.com/Rechip/source_location/archive/refs/tags/v0.1.1.zip"
+    sha256: "2e177025c77d96cf9ccd994008dc5281e2385e1ee1bc89ca261807ce3f32c692"
+```
+
+```cpp
+struct VersionSource : Simple {
+    using Simple::Simple;
+
+    std::string url    = bound("url");
+    std::string sha256 = bound("sha256").addRuleLength(64, 64, "sha256sum muset be exactly 64 characters long");
+};
+
+struct Configuration : Simple {
+    using Simple::Simple;
+
+    std::map<std::string, VersionSource>                versions                    = bound("sources");
+    std::unordered_map<std::string, VersionSource>      unordered_versions          = bound("sources");
+    std::multimap<std::string, VersionSource>           multimap_versions           = bound("sources");
+    std::unordered_multimap<std::string, VersionSource> unordered_multimap_versions = bound("sources");
+};
+
+```
+
+| :warning: LIMITATION          |
+|:------------------------------|
+| Class Simple is not default-constructible and any usage of `operator[]` on associative containers will produce code requiring a default-constructible value type. Use only `.at` function to access values.
+
 # Kudos
+
 This is a mere wrapper around [yaml-cpp](https://github.com/jbeder/yaml-cpp) library. All the heavy lifting is done there. Real kudos.
 
 # TODO
 - [ ] Optimize (storing copies of the YAML::Node)
 - [x] Add more std:: types
+- [x] Add validation rules
 - [ ] Add more tests

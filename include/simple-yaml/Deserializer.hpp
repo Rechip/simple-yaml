@@ -132,6 +132,29 @@ struct Deserializer<std::vector<T>> {
 	}
 };
 
+// Associative containers
+template<typename T>
+requires std::is_destructible_v<typename T::key_type> || std::is_destructible_v<typename T::mapped_type>
+struct Deserializer<T> {
+	static T deserialize(const YAML::Node& n, const std::string& path) {
+		if (!n.IsDefined()) {
+			throw MissingNode("Missing basic type node " + path, n.Mark());
+		}
+		if (!n.IsMap()) {
+			throw InvalidNodeType("Invalid node type " + path, n.Mark());
+		}
+
+		T result;
+		for (YAML::const_iterator it = n.begin(); it != n.end(); ++it) {
+			auto fullpath = path + "/" + it->first.as<std::string>();
+			auto key      = simple_yaml::Deserializer<std::decay_t<typename T::key_type>>::deserialize(it->first, path);
+			auto value    = simple_yaml::Deserializer<std::decay_t<typename T::mapped_type>>::deserialize(it->second, fullpath);
+			result.emplace(std::move(key), std::move(value));
+		}
+		return result;
+	}
+};
+
 } // namespace simple_yaml
 
 #endif

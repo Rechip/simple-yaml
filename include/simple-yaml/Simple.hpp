@@ -25,6 +25,8 @@ struct Simple {
 	}
 	Simple(const Simple& other) = default;
 	Simple(Simple&& other)      = default;
+	Simple& operator=(const Simple& other) = default;
+	Simple& operator=(Simple&& other) = default;
 
 	inline Field<void*> bound(const std::string& key) {
 		return Field<void*>{_data[key], _path + "/" + key};
