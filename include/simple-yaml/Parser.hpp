@@ -5,6 +5,7 @@
 #include <chrono>
 #include <regex>
 #include <string_view>
+#include <unordered_map>
 
 namespace simple_yaml {
 
