@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/Rechip/simple-yaml/compare/v0.2.1...v0.2.2) (2022-01-29)
+
+
+### Bug Fixes
+
+* missing include in Parser.hpp ([ecfcb51](https://github.com/Rechip/simple-yaml/commit/ecfcb511714cc812729634633a916398beb3357c))
+
 ### [0.2.1](https://github.com/Rechip/simple-yaml/compare/v0.2.0...v0.2.1) (2022-01-22)
 
 
